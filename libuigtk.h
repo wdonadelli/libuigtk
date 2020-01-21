@@ -80,12 +80,13 @@ Willian Donadelli <wdonadelli@gmail.com>
 /*-----------------------------------------------------------------------------
 	UIGTK_signal() conecta os sinais definidos diretamente na interface
 	Retornos:
-		não há
+		0 - se algum error ocorrer
+		1 - se não ocorrer erros
 	Argumentos:
 		name   - nome da função a ser disparada quando o evento ocorrer
 		method - função a ser disparada quando o evento ocorrer
 -----------------------------------------------------------------------------*/
-	void UIGTK_signal(char *name, void (*method)());
+	int UIGTK_signal(char *name, void (*method)());
 
 /*-----------------------------------------------------------------------------
 	UIGTK_run() inicia o looping do GTK (última ação)
