@@ -48,7 +48,7 @@ Willian Donadelli <wdonadelli@gmail.com>
 /*-----------------------------------------------------------------------------
 	UIGTK_load() inicia a inteface GTK a partir de um arquivo.ui (builde xml)
 	Retornos:
-		0 - se algum error ocorrer
+		0 - se algum erro ocorrer
 		1 - se não ocorrer erros
 	Argumentos:
 		file - é o nome do arquivo com a interface xml (.ui)
@@ -58,7 +58,7 @@ Willian Donadelli <wdonadelli@gmail.com>
 /*-----------------------------------------------------------------------------
 	UIGTK_object() obtém o objeto da interface
 	Retornos:
-		NULL    - se algum error ocorrer
+		NULL    - se algum erro ocorrer
 		GObject - se não ocorrer erros
 	Argumentos:
 		id - identificador do objeto
@@ -68,7 +68,7 @@ Willian Donadelli <wdonadelli@gmail.com>
 /*-----------------------------------------------------------------------------
 	UIGTK_handler() adiciona disparadores a um objeto da interface
 	Retornos:
-		0 - se algum error ocorrer
+		0 - se algum erro ocorrer
 		1 - se não ocorrer erros
 	Argumentos:
 		id     - identificador do objeto
@@ -80,7 +80,7 @@ Willian Donadelli <wdonadelli@gmail.com>
 /*-----------------------------------------------------------------------------
 	UIGTK_signal() conecta os sinais definidos diretamente na interface
 	Retornos:
-		0 - se algum error ocorrer
+		0 - se algum erro ocorrer
 		1 - se não ocorrer erros
 	Argumentos:
 		name   - nome da função a ser disparada quando o evento ocorrer
