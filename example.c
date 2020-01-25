@@ -1,29 +1,31 @@
 #include "libuigtk.h"
 
 static void hello(GtkWidget *widget, gpointer data) {
-	UIGTK_msg(0, "Hello!");
+	uigtk_msg(0, "Hello!");
 }
 
 static void bye(GtkWidget *widget, gpointer data) {
-	int result = UIGTK_msg(3, "Do you really want to say goodbye?");
+	int result = uigtk_msg(3, "Do you really want to say goodbye?");
 	if (result == 1) {
-		UIGTK_msg(0, "Bye!");
+		uigtk_msg(0, "Bye!");
 		gtk_main_quit();
 	}
 }
 
 int main(int argc, char *argv[]) {
-	UIGTK_load("example.ui");
+	uigtk_init("example.ui");
+
+	//g_print("%s", G_OBJECT_TYPE_NAME(uigtk_object("btn1")));
 
 	//Padrão
-	UIGTK_signal("gtk_main_quit", gtk_main_quit);
-	UIGTK_signal("hello", hello);
-	UIGTK_signal("bye", bye);
+	uigtk_signal("gtk_main_quit", gtk_main_quit);
+	uigtk_signal("hello", hello);
+	uigtk_signal("bye", bye);
 
 	//Alternativo
-	//UIGTK_handler("window", "destroy", gtk_main_quit);
-	//UIGTK_handler("btn1", "pressed", hello);
-	//UIGTK_handler("btn2", "pressed", bye);
+	//uigtk_handler("windows", "destroy", gtk_main_quit);
+	//uigtk_handler("btn1", "pressed", hello);
+	//uigtk_handler("btn2", "pressed", bye);
 
-	UIGTK_run();
+	uigtk_main();
 }

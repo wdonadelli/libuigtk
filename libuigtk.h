@@ -46,63 +46,59 @@ Willian Donadelli <wdonadelli@gmail.com>
 	#include <gtk/gtk.h>
 
 /*-----------------------------------------------------------------------------
-	UIGTK_load() inicia a inteface GTK a partir de um arquivo.ui (builde xml)
-	Retornos:
-		0 - se algum erro ocorrer
-		1 - se não ocorrer erros
+	uigtk_load() inicia a inteface GTK a partir de um arquivo.ui (builde xml)
 	Argumentos:
 		file - é o nome do arquivo com a interface xml (.ui)
+	Saída:
+		Força o encerramento da aplicação se algum erro for encontrado
 -----------------------------------------------------------------------------*/
-	int UIGTK_load(char file[]);
+	void uigtk_init(char *file);
 
 /*-----------------------------------------------------------------------------
-	UIGTK_object() obtém o objeto da interface
+	uigtk_signal() conecta os sinais definidos diretamente na interface
+	Argumentos:
+		name   - nome da função a ser disparada quando o evento ocorrer
+		method - função a ser disparada quando o evento ocorrer
+	Saída:
+		Força o encerramento da aplicação se algum erro for encontrado
+-----------------------------------------------------------------------------*/
+	void uigtk_signal(char *name, void (*method)());
+
+/*-----------------------------------------------------------------------------
+	uigtk_run() inicia o looping do GTK (última ação)
+	Saída:
+		Força o encerramento da aplicação se algum erro for encontrado
+-----------------------------------------------------------------------------*/
+	void uigtk_main(void);
+
+/*-----------------------------------------------------------------------------
+	uigtk_object() obtém o objeto da interface
 	Retornos:
-		NULL    - se algum erro ocorrer
-		GObject - se não ocorrer erros
+		NULL    - se o objeto não for encontrado
+		GObject - se o objeto for encontrado
 	Argumentos:
 		id - identificador do objeto
 -----------------------------------------------------------------------------*/
-	GObject *UIGTK_object(char *id);
+	GObject *uigtk_object(char *id);
 
 /*-----------------------------------------------------------------------------
-	UIGTK_handler() adiciona disparadores a um objeto da interface
+	uigtk_handler() adiciona disparadores a um objeto da interface
 	Retornos:
-		0 - se algum erro ocorrer
-		1 - se não ocorrer erros
+		0 - se não for possível vincular o disparador
+		1 - se for possível vincular o disparador
 	Argumentos:
 		id     - identificador do objeto
 		event  - evento a ser disparado
 		method - função a ser disparada quando o evento ocorrer
 -----------------------------------------------------------------------------*/
-	int UIGTK_handler(char *id, char *event, void (*method)());
+	int uigtk_handler(char *id, char *event, void (*method)());
 
 /*-----------------------------------------------------------------------------
-	UIGTK_signal() conecta os sinais definidos diretamente na interface
+	uigtk_msg() exibe uma caixa de mensagem
 	Retornos:
-		0 - se algum erro ocorrer
-		1 - se não ocorrer erros
-	Argumentos:
-		name   - nome da função a ser disparada quando o evento ocorrer
-		method - função a ser disparada quando o evento ocorrer
------------------------------------------------------------------------------*/
-	int UIGTK_signal(char *name, void (*method)());
-
-/*-----------------------------------------------------------------------------
-	UIGTK_run() inicia o looping do GTK (última ação)
-	Retornos:
-		0 - se algum erro ocorrer
-		1 - se não ocorrer erros
------------------------------------------------------------------------------*/
-	int UIGTK_run(void);
-
-/*-----------------------------------------------------------------------------
-	UIGTK_msg() exibe uma caixa de mensagem
-	Retornos:
-		2  - se não foi clicado
-		1  - se sim ou ok forem clicados
-		0  - se a caixa foi fechada
-		-1 - se algum erro ocorreu ao abrir a mensagem
+		-1 - se "não" foi clicado
+		 0 - se a caixa foi fechada
+		 1 - se "sim" ou "ok" forem clicados
 	Argumentos:
 		type - 
 			0 - para caixa de informação (OK)
@@ -112,6 +108,6 @@ Willian Donadelli <wdonadelli@gmail.com>
 			4 - para caixa genérica (CANCELAR)
 		text - texto da mensagem
 -----------------------------------------------------------------------------*/
-	int UIGTK_msg(int type, char *text);
+	int uigtk_msg(int type, char *text);
 
 #endif
