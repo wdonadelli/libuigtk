@@ -2,7 +2,7 @@
 Library UI GTK (v1.0.0)
 
 This is a C-language written library designed to facilitate the creation of
-the graphical environment with the GTK tool using the kit's GtkBuilder method
+the graphical environment with the GTK tool using the kit's GtkBuilder function
 (see https://developer.gnome.org/gtk3/stable/GtkBuilder.html).
 
 MIT License
@@ -44,9 +44,14 @@ Willian Donadelli <wdonadelli@gmail.com>
 	A presente biblioteca exige a biblioteca GTK
 -----------------------------------------------------------------------------*/
 	#include <gtk/gtk.h>
+	
+/*-----------------------------------------------------------------------------
+	UIGTK_BUILDER retorna o GTK Builder
+-----------------------------------------------------------------------------*/
+	#define UIGTK_BUILDER
 
 /*-----------------------------------------------------------------------------
-	uigtk_load() inicia a inteface GTK a partir de um arquivo.ui (builde xml)
+	uigtk_init() inicia a inteface GTK a partir de um arquivo.ui (builde xml)
 	Argumentos:
 		file - é o nome do arquivo com a interface xml (.ui)
 	Saída:
@@ -55,24 +60,30 @@ Willian Donadelli <wdonadelli@gmail.com>
 	void uigtk_init(char *file);
 
 /*-----------------------------------------------------------------------------
-	uigtk_signal() conecta os sinais definidos diretamente na interface
+	uigtk_callback() conecta os sinais definidos diretamente na interface
 	Argumentos:
-		name   - nome da função a ser disparada quando o evento ocorrer
-		method - função a ser disparada quando o evento ocorrer
+		name    - nome da função a ser disparada quando o evento ocorrer
+		handler - função a ser disparada quando o evento ocorrer
 	Saída:
 		Força o encerramento da aplicação se algum erro for encontrado
+	Sugere o uso da macro uigtk_handler()
 -----------------------------------------------------------------------------*/
-	void uigtk_signal(char *name, void (*method)());
+	void uigtk_callback(char *name, void (*handler)());
 
 /*-----------------------------------------------------------------------------
-	uigtk_run() inicia o looping do GTK (última ação)
+	uigtk_handler() macro para uigtk_callback() (name desnecessário)
+-----------------------------------------------------------------------------*/
+	#define uigtk_handler(handler) uigtk_callback(#handler, handler)
+
+/*-----------------------------------------------------------------------------
+	uigtk_main() inicia o looping principal do GTK (última ação)
 	Saída:
 		Força o encerramento da aplicação se algum erro for encontrado
 -----------------------------------------------------------------------------*/
 	void uigtk_main(void);
 
 /*-----------------------------------------------------------------------------
-	uigtk_object() obtém o objeto da interface
+	uigtk_object() obtém o objeto da interface a partir de seu id
 	Retornos:
 		NULL    - se o objeto não for encontrado
 		GObject - se o objeto for encontrado
@@ -82,19 +93,19 @@ Willian Donadelli <wdonadelli@gmail.com>
 	GObject *uigtk_object(char *id);
 
 /*-----------------------------------------------------------------------------
-	uigtk_handler() adiciona disparadores a um objeto da interface
+	uigtk_connect() adiciona disparadores a um objeto da interface
 	Retornos:
 		0 - se não for possível vincular o disparador
 		1 - se for possível vincular o disparador
 	Argumentos:
-		id     - identificador do objeto
-		event  - evento a ser disparado
-		method - função a ser disparada quando o evento ocorrer
+		id      - identificador do objeto
+		event   - evento a ser disparado
+		handler - função a ser disparada quando o evento ocorrer
 -----------------------------------------------------------------------------*/
-	int uigtk_handler(char *id, char *event, void (*method)());
+	int uigtk_connect(char *id, char *event, void (*handler)());
 
 /*-----------------------------------------------------------------------------
-	uigtk_msg() exibe uma caixa de mensagem
+	uigtk_dialog() exibe uma caixa de mensagem
 	Retornos:
 		-1 - se "não" foi clicado
 		 0 - se a caixa foi fechada
@@ -108,6 +119,6 @@ Willian Donadelli <wdonadelli@gmail.com>
 			4 - para caixa genérica (CANCELAR)
 		text - texto da mensagem
 -----------------------------------------------------------------------------*/
-	int uigtk_msg(int type, char *text);
+	int uigtk_dialog(int type, char *text);
 
 #endif

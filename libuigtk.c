@@ -1,222 +1,249 @@
 /*___BIBLIOTECAS_____________________________________________________________*/
-
 #include "libuigtk.h"
-#include <string.h>
 
-/*___DEFINIÇÕES_(MACROS)_____________________________________________________*/
+/*___MACROS__________________________________________________________________*/
 
-/* UIGTK_MSG macro auxiliar para mensagens da biblioteca */
-#define UIGTK_MSG(color, type, fname, msg) g_print( \
-	"\n\033[1;%dm%s \033[1;36mlibuigtk.%s()\033[0m:\n\t\"%s\"\n\n", \
-	color, \
-	type, \
-	UIGTK.fname, \
-	msg \
-)
+/* Mensagens */
+#define UIGTK_MSG_NO_UIGTK "UIGTK not initialized correctly, see uigtk_init function."
+#define UIGTK_MSG_NO_GTK "Failed to initialize the GTK."
+#define UIGTK_MSG_NO_BUILDER "Failed to initialize the GTK Builder."
+#define UIGTK_MSG_NO_WINDOW "Top level window (GtkWindow object) not found."
+#define UIGTK_MSG_NO_SIGNAL "No callback symbols added."
+#define UIGTK_MSG_NO_DESTROY "gtk_main_quit not defined and the attempt to set the trigger failed."
+#define UIGTK_MSG_DESTROY "gtk_main_quit set automatically."
+#define UIGTK_MSG_NO_OBJECT "Object not found."
+#define UIGTK_MSG_NO_HANDLER "Failed to link the handler."
+#define UIGTK_MSG_USER "\n\033[1;%dm%s \033[1;36mlibuigtk.uigtk_%s() [%d]\033[0m:\n\t\"%s\"\n\n"
 
-/* UIGTK_FNAME define o nome da função para fins UIGTK_MSG */
-#define UIGTK_FNAME(name) strcpy(UIGTK.fname, name); UIGTK_status()
+/* Valores */
+#define UIGTK_BUILDER (_uigtk.init ? (_uigtk.builder) : NULL)
 
-/* UIGTK_INFO exibe uma mensagem (msg) informativa */
-#define UIGTK_INFO(msg)  UIGTK_MSG(34, "INFO", fname, msg)
+/* Funções */
+#define UIGTK_INFO(msg, name) g_print(UIGTK_MSG_USER, 34, "INFO", name, __LINE__, msg)
+#define UIGTK_WARN(msg, name) g_print(UIGTK_MSG_USER, 33, "WARN", name, __LINE__, msg)
+#define UIGTK_ERROR(msg, name) g_printerr(UIGTK_MSG_USER, 31, "ERROR", name, __LINE__, msg); exit(1)
+#define UIGTK_FNAME(name) strcpy(_uigtk.fname, name);
+#define UIGTK_CHECK() if (!_uigtk.init) {UIGTK_ERROR(UIGTK_MSG_NO_UIGTK);}
 
-/* UIGTK_WARN exibe uma mensagem (msg) de alerta */
-#define UIGTK_WARN(msg)  UIGTK_MSG(33, "WARN", fname, msg)
 
-/* UIGTK_ERROR exibe uma mensagem (msg) de erro */
-#define UIGTK_ERROR(msg) UIGTK_MSG(31, "ERROR", fname, msg); exit(1)
 
-/* UIGTK_READY checa se é necessário proceder com a ação */
-#define UIGTK_READY() if (UIGTK.init) {return;}
 
-/* UIGTK_CHECK checa se o UIGTK foi iniciado corretamente */
-#define UIGTK_CHECK() if (!UIGTK.init) {UIGTK_ERROR(UIGTK.msgLoad);}
 
 /*___VARIÁVEIS_GLOBAIS_______________________________________________________*/
 
-/* UIGTK guarda o status, os ponteiros e as mensagens do aplicativo */
 static struct {
-	int init;
-	int signal;
-	int quit;
+	/* _uigtk guarda o status e os ponteiros */
+	int gtk: 1;
+	int signal: 1;
+	int destroy: 1;
 	GtkBuilder *builder;
 	GtkWindow *window;
-	char msgLoad[80];
-	char fname[80];
-} UIGTK;
+} _uigtk;
 
 /*___FUNÇÕES_INTERNAS________________________________________________________*/
 
-/*...........................................................................*/
-/* UIGTK_status inicia a estrutura UIGTK */
-static void UIGTK_status(void) {
-
-	UIGTK_READY();
-	UIGTK.init    = 0;
-	UIGTK.signal  = 0;
-	UIGTK.quit    = 0;
-	UIGTK.builder = NULL;
-	UIGTK.window  = NULL;
-	strcpy(UIGTK.msgLoad, "UIGTK not initialized correctly, see uigtk_init function.");
-
+static void _uigtk_reset(void) {
+	/*-- Inicializa o status --*/
+	_uigtk.gtk = !_uigtk.gtk ? 0 : 1;
+	if (_uigtk.builder == NULL) {
+		_uigtk.window  = NULL;
+		_uigtk.destroy = 0;
+		_uigtk.signal  = 0;
+	}
 }
 
 /*...........................................................................*/
-/* UIGTK_gtk inicia o GTK */
-static void UIGTK_gtk(void) {
 
-	UIGTK_READY()
+static void _uigtk_gtk(void) {
+	/*-- Inicia o GTK --*/
 
-	/* Inicializar GTK */
+	/* Chamando GTK e verificando erro */
 	if (gtk_init_check(0, NULL) != TRUE) {
-		UIGTK_ERROR("Failed to initialize the GTK.");
+		UIGTK_ERROR(UIGTK_MSG_NO_GTK, "init");
+	}
+	_uigtk.gtk = 1;
+}
+
+/*...........................................................................*/
+
+static void _uigtk_builder(void) {
+	/*-- Carrega o GTK Builder --*/
+
+	/* Definindo GTK Buider */
+	_uigtk.builder = gtk_builder_new();
+	/* Verificando erro */
+	if (_uigtk.builder == NULL) {
+		UIGTK_ERROR(UIGTK_MSG_NO_BUILDER, "init");
 	}
 }
 
 /*...........................................................................*/
-/* UIGTK_builder inicia o GTK Builder */
-static void UIGTK_builder(void) {
 
-	UIGTK_READY();
+static void _uigtk_file(char *file) {
+	/*-- Carrega o arquivo .ui --/
 
-	/* Definir GTK Builder */
-	UIGTK.builder = gtk_builder_new();
-	/* Checar erro */
-	if (UIGTK.builder == NULL) {
-		UIGTK_ERROR("Failed to initialize the GTK Builder.");
-	}
-}
-
-/*...........................................................................*/
-/* UIGTK_file carrega o arquivo .ui */
-static void UIGTK_file(char *file) {
-
-	/* Variáveis locais */
+	/* Variável de erro */
 	GError *error;
-
-	/* Carregando arquivo .ui */
-	if (!gtk_builder_add_from_file(UIGTK.builder, file, &error)) {
-		UIGTK_ERROR(error->message);
+	/* Carrega o arquivo e checa o sucesso na operação */
+	if (!gtk_builder_add_from_file(_uigtk.builder, file, &error)) {
+		UIGTK_ERROR(error->message, "init");
 	}
-	/* Limpar memória */	
+	/* Limpar a memória */
 	g_clear_error(&error);
-
 }
 
 /*...........................................................................*/
-/* UIGTK_window tentar localizar window top level */
-static void UIGTK_window(void) {
+
+static void _uigtk_window(void) {
+	/*-- Localiza window top level --*/
 
 	/* Tentando obter a janela de nível superior */
-	GSList    *objects = gtk_builder_get_objects(UIGTK.builder);
+	GSList    *objects = gtk_builder_get_objects(_uigtk.builder);
 	GtkWidget *window  = gtk_widget_get_toplevel((GtkWidget*) objects->data);
 	/* Limpando memória */
 	g_slist_free(objects);
-	/* Checando se houve sucesso */
-	if (!gtk_widget_is_toplevel(window)) {
-		UIGTK_ERROR("Failed to set the top level window, define a GtkWindow object.");
-	}
-	/* Definindo valor */
-	UIGTK.window = GTK_WINDOW(window);
+	/* Definindo se houve sucesso */
+	_uigtk.window = gtk_widget_is_toplevel(window) ? GTK_WINDOW(window) : NULL;
 }
 
 /*...........................................................................*/
-/* UIGTK_quit define gtk_main_quit à janela principal, caso não exista */
-static void UIGTK_quit(void) {
 
-	/* Caso já tenha sido definida, retornar */
-	if (UIGTK.quit) return;
-	/* tentando conectar o sinal */
-	if (g_signal_connect(G_OBJECT(UIGTK.window), "destroy", G_CALLBACK(gtk_main_quit), NULL) <= 0) {
-		UIGTK_ERROR("Error when linking the function gtk_main_quit to the top level window when it is destroyed.");
+static void _uigtk_check_destroy(void) {//FIXME tá muito bagunçado isso aqui
+	/*-- Define gtk_main_quit à window, caso não exista --*/
+
+	/* Alertar se nenhum sinal for adicionado */
+	if (!_uigtk.signal) {
+		UIGTK_WARN(UIGTK_MSG_NO_SIGNAL, "main");	
 	}
-	UIGTK_INFO("The gtk_main_quit function has been linked to the top level window when it is destroyed.");
+	/* Alertar se window não for localizado */
+	if (_uigtk.window == NULL) {
+		UIGTK_WARN(UIGTK_MSG_NO_WINDOW, "main");
+	}
+	/* Sair se destroy e window não existirem */
+	if (!_uigtk.destroy && _uigtk.window == NULL) {
+		UIGTK_ERROR(UIGTK_MSG_NO_DESTROY, "main");
+	}
+	/* Tentar adicionar função para parar o looping ao destruir a janela */
+	if (!_uigtk.destroy) {
+		int result = g_signal_connect(G_OBJECT(_uigtk.window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
+		if (result <= 0) {
+			UIGTK_ERROR(UIGTK_MSG_NO_DESTROY, "main");
+		}
+		/* Em caso de sucesso, informar */
+		UIGTK_INFO(UIGTK_MSG_DESTROY, "main");
+		_uigtk.destroy = 1;
+	}
 }
 
-/*___FUNÇÕES_EXTERNAS_(VER_CABEÇALHO)________________________________________*/
+/*...........................................................................*/
+
+static void _uigtk_check_uigtk(int builder, char *name) {
+	/*-- Checa se as fases do uigtk foram concluídas --*/
+
+	/* Verificando se GTK foi carregado */
+	if (!_uigtk.gtk) {
+		UIGTK_ERROR(UIGTK_MSG_NO_GTK, name);
+	}
+	/* Verificando se GTK Builder foi carregado */
+	if (builder && _uigtk.builder == NULL) {
+		UIGTK_ERROR(UIGTK_MSG_NO_BUILDER, name);
+	}
+}
+
+/*___FUNÇÕES_DO_CABEÇALHO____________________________________________________*/
 
 /*...........................................................................*/
+
 void uigtk_init(char *file) {
 
-	UIGTK_FNAME("uigtk_init");
-	UIGTK_gtk();
-	UIGTK_builder();
-	UIGTK_file(file);
-	UIGTK.init = 1;
-}
-
-/*...........................................................................*/
-void uigtk_signal(char *name, void (*method)()) {
-
-	UIGTK_FNAME("uigtk_signal");
-	UIGTK_CHECK();
-
-	/* Adicionando sinal ao builder */
-	gtk_builder_add_callback_symbol(UIGTK.builder, name, method);
-	/* Se for gtk_main_quit, informar */
-	if (!UIGTK.quit && method == gtk_main_quit) {
-		UIGTK.quit = 1;
+	/* Definindo status inicial */
+	_uigtk_reset();
+	/* Carregando GTK, se necessário */
+	if (!_uigtk.gtk) {
+		_uigtk_gtk();
 	}
-	UIGTK.signal = 1;
+	/* Carregando GTK Builder, se necessário */
+	if (_uigtk.builder == NULL) {
+		_uigtk_builder();
+	}
+	/* Carregando arquivo.ui */
+	_uigtk_file(file);
 }
 
 /*...........................................................................*/
+
+void uigtk_callback(char *name, void (*handler)()) {
+
+	_uigtk_check_uigtk(1, "callback/handler");
+	/* Adicionando sinal ao builder */
+	gtk_builder_add_callback_symbol(_uigtk.builder, name, handler);
+	/* Validando destroy */
+	if (handler == gtk_main_quit) {
+		_uigtk.destroy = 1;
+	}
+	/* Validando sinal */
+	_uigtk.signal = 1;
+}
+
+/*...........................................................................*/
+
 void uigtk_main(void) {
 
-	UIGTK_FNAME("uigtk_main");
-	UIGTK_CHECK();
-	UIGTK_window();
-	UIGTK_quit();
+	_uigtk_check_uigtk(1, "main");
+	/* Definindo window */
+	_uigtk_window();
+	/* Checando destroy */
+	_uigtk_check_destroy();
 	/* Conectando sinais */
-	gtk_builder_connect_signals(UIGTK.builder, NULL);
+	gtk_builder_connect_signals(_uigtk.builder, NULL);
 	/* iniciando GTK main loop */
 	gtk_main();
-	/* Zerando status após sair do loop */
-	UIGTK.init = 0;
+	/* Apagando builder após o looping */
+	_uigtk.builder = NULL;
 }
 
 /*...........................................................................*/
+
 GObject *uigtk_object(char *id) {
 
-	UIGTK_FNAME("uigtk_object");
-	UIGTK_CHECK();
-
+	_uigtk_check_uigtk(1, "object");
 	/* Obtendo o objeto */
-	GObject *object = gtk_builder_get_object(UIGTK.builder, id);
+	GObject *object = gtk_builder_get_object(_uigtk.builder, id);
 	return object;
 }
 
 /*...........................................................................*/
-int uigtk_handler(char *id, char *event, void (*method)()) {
+int uigtk_connect(char *id, char *event, void (*handler)()) {
 
-	UIGTK_FNAME("uigtk_handler");
-	UIGTK_CHECK();
-
+	_uigtk_check_uigtk(1, "connect");
 	/* Obtendo o objeto */
 	GObject *object = uigtk_object(id);
 	/* Checar erro na localização do objeto */
 	if (object == NULL) {
-		UIGTK_WARN("Object not found.");
+		UIGTK_WARN(UIGTK_MSG_NO_OBJECT, "connect");
 		return 0;
 	}
 	/* Tentar Atribuir disparador ao elemento */
-	if (g_signal_connect(object, event, G_CALLBACK(method), NULL) <= 0) {
-		UIGTK_WARN("Failed to link the handler.");
+	if (g_signal_connect(object, event, G_CALLBACK(handler), NULL) <= 0) {
+		UIGTK_WARN(UIGTK_MSG_NO_HANDLER, "connect");
 		return 0;
 	}
 	/* Se for gtk_main_quit, informar */
-	if (!UIGTK.quit && method == gtk_main_quit) {
-		UIGTK.quit = 1;
+	if (handler == gtk_main_quit) {
+		_uigtk.destroy = 1;
 	}
+	/* Em caso de sucesso */
 	return 1;
 }
 
 /*...........................................................................*/
-int uigtk_msg(int type, char *text) {
+int uigtk_dialog(int type, char *text) {
 
-	UIGTK_FNAME("uigtk_msg");
-	UIGTK_CHECK();
-
+	_uigtk_check_uigtk(0, "dialog");
+	/* Alertar se window não existir */
+	if (_uigtk.window == NULL) {
+		UIGTK_WARN(UIGTK_MSG_NO_WINDOW, "dialog");
+	}
 	/* Definir variáveis */
 	GtkButtonsType button;
 	GtkMessageType style;
@@ -246,7 +273,7 @@ int uigtk_msg(int type, char *text) {
 	}
 	/* Definindo a caixa de mensagem */
 	dialog = gtk_message_dialog_new(
-		UIGTK.window,
+		_uigtk.window,
 		GTK_DIALOG_MODAL,
 		style,
 		button,
