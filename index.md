@@ -72,7 +72,8 @@ void uigtk_init(char *file);
 
 #### Parameters
 
-|file:|:Interface file path|
+|--:|:--|
+|file|Interface file path|
 
 #### Returns
 
