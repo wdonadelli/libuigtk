@@ -93,9 +93,10 @@ To connect the signals to your handlers, you must use the `uigtk_hadler()` funct
 ```
 
 #### Parameters
+
 |Name|Description|
 |--:|---|
-|handler|Name of the handler function.|
+|handler|Name of the handler function|
 
 #### Returns
 
@@ -138,8 +139,8 @@ As noted in the interface file, there are two defined handlers whose constructio
 The prototypes of the functions would look like this:
 
 ```c
-static void hello(GtkWidget *widget, gpointer data);
-static void bye(GtkWidget *widget, gpointer data);
+void hello(GtkWidget *widget, gpointer data);
+void bye(GtkWidget *widget, gpointer data);
 ```
 
 To start the construction, just call the function to initialize the library indicating the interface file:
@@ -167,9 +168,9 @@ Grouping all the information, we have:
 ```c
 #include "libuigtk.h"
 
-static void hello(GtkWidget *widget, gpointer data);
+void hello(GtkWidget *widget, gpointer data);
 
-static void bye(GtkWidget *widget, gpointer data);
+void bye(GtkWidget *widget, gpointer data);
 
 void main(int argc, char *argv[]) {
 
