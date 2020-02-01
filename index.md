@@ -72,6 +72,7 @@ void uigtk_init(char *file);
 
 #### Parameters
 
+|Name|Description|
 |--:|---|
 |file|Interface file path|
 
@@ -83,15 +84,110 @@ Forces the application to exit if any identifiable error is found. Possible erro
 - Failure to start GTK Builder; and
 - Failed to load the interface file.
 
+### Connecting signals
 
+To connect the signals to your handlers, you must use the `uigtk_hadler()` function, whose characteristics are described below:
 
+```c
+#define uigtk_handler(handler)
+```
 
+#### Parameters
+|Name|Description|
+|--:|---|
+|handler|Name of the handler function.|
 
+#### Returns
 
+Forces the application to exit if any identifiable error is found. Possible errors are:
 
+- Call the function without initializing the interface.
 
+### Start the main loop
 
+To start the main loop, use the `uigtk_main()` function, whose characteristics are described below:
 
+```c
+void uigtk_main()
+```
+#### Returns
+
+Forces the application to exit if any identifiable error is found. Possible errors are:
+
+- Call the function without initializing the interface, and
+- If the top-level window (`GtkWindow` object) is not found in situations where `gtk_main_quit()` was not defined by the library.
+
+### Example
+
+Considering that the name of the file containing the source code is called "example.c" and that it is in the same directory as the interface file "example.ui", the following sequence of commands will be necessary to build the interface.
+
+Initially it is necessary to include the library header in our source code. Considering that both are in the same directory:
+
+```c
+#include "libuigtk.h"
+```
+
+As noted in the interface file, there are two defined handlers whose construction needs to be carried out:
+
+```xml
+<signal name="clicked" handler="hello" />
+...
+<signal name="clicked" handler="bye" />
+```
+
+The prototypes of the functions would look like this:
+
+```c
+static void hello(GtkWidget *widget, gpointer data);
+static void bye(GtkWidget *widget, gpointer data);
+```
+
+To start the construction, just call the function to initialize the library indicating the interface file:
+
+```c
+uigtk_init("example.ui");
+```
+
+After initialization, the manipulators must be connected, according to the signals defined in the interface:
+
+```c
+uigtk_handler(gtk_main_quit);
+uigtk_handler(hello);
+uigtk_handler(bye);
+```
+
+Finally, the main loop must be initialized:
+
+```c
+uigtk_main();
+```
+
+Grouping all the information, we have:
+
+```c
+#include "libuigtk.h"
+
+static void hello(GtkWidget *widget, gpointer data);
+
+static void bye(GtkWidget *widget, gpointer data);
+
+void main(int argc, char *argv[]) {
+
+	/* Interface initialization */
+	uigtk_init("example.ui");
+
+	/* Connecting signals */
+	uigtk_handler(gtk_main_quit);
+	uigtk_handler(hello);
+	uigtk_handler(bye);
+
+	/* Start the main loop */	
+	uigtk_main();
+
+}
+```
+
+Don't forget to define the actions of the manipulators.
 
 
 
