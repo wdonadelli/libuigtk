@@ -72,7 +72,7 @@ void uigtk_init(char *file);
 
 #### Parameters
 
-|--:|:--|
+|--:|---|
 |file|Interface file path|
 
 #### Returns
@@ -82,6 +82,18 @@ Forces the application to exit if any identifiable error is found. Possible erro
 - GTK startup failure;
 - Failure to start GTK Builder; and
 - Failed to load the interface file.
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
