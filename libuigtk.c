@@ -1,12 +1,12 @@
 /*___BIBLIOTECAS_____________________________________________________________*/
+
 #include "libuigtk.h"
 
 /*___MACROS__________________________________________________________________*/
 
 /* Mensagens */
-#define UIGTK_MSG_NO_UIGTK "UIGTK not initialized correctly, see uigtk_init function."
-#define UIGTK_MSG_NO_GTK "Failed to initialize the GTK."
-#define UIGTK_MSG_NO_BUILDER "Failed to initialize the GTK Builder."
+#define UIGTK_MSG_NO_GTK "GTK not initialized (call the uigtk_init function)."
+#define UIGTK_MSG_NO_BUILDER "GTK Builder not initialized."
 #define UIGTK_MSG_NO_WINDOW "Top level window (GtkWindow object) not found."
 #define UIGTK_MSG_NO_SIGNAL "No callback symbols added."
 #define UIGTK_MSG_NO_DESTROY "gtk_main_quit not defined and the attempt to set the trigger failed."
@@ -15,19 +15,11 @@
 #define UIGTK_MSG_NO_HANDLER "Failed to link the handler."
 #define UIGTK_MSG_USER "\n\033[1;%dm%s \033[1;36mlibuigtk.uigtk_%s() [%d]\033[0m:\n\t\"%s\"\n\n"
 
-/* Valores */
-#define UIGTK_BUILDER (_uigtk.init ? (_uigtk.builder) : NULL)
-
 /* Funções */
 #define UIGTK_INFO(msg, name) g_print(UIGTK_MSG_USER, 34, "INFO", name, __LINE__, msg)
 #define UIGTK_WARN(msg, name) g_print(UIGTK_MSG_USER, 33, "WARN", name, __LINE__, msg)
 #define UIGTK_ERROR(msg, name) g_printerr(UIGTK_MSG_USER, 31, "ERROR", name, __LINE__, msg); exit(1)
 #define UIGTK_FNAME(name) strcpy(_uigtk.fname, name);
-#define UIGTK_CHECK() if (!_uigtk.init) {UIGTK_ERROR(UIGTK_MSG_NO_UIGTK);}
-
-
-
-
 
 /*___VARIÁVEIS_GLOBAIS_______________________________________________________*/
 
@@ -152,8 +144,6 @@ static void _uigtk_check_uigtk(int builder, char *name) {
 
 /*___FUNÇÕES_DO_CABEÇALHO____________________________________________________*/
 
-/*...........................................................................*/
-
 void uigtk_init(char *file) {
 
 	/* Definindo status inicial */
@@ -176,7 +166,7 @@ void uigtk_callback(char *name, void (*handler)()) {
 
 	_uigtk_check_uigtk(1, "callback/handler");
 	/* Adicionando sinal ao builder */
-	gtk_builder_add_callback_symbol(_uigtk.builder, name, handler);
+	gtk_builder_add_callback_symbol(_uigtk.builder, name, G_CALLBACK(handler));
 	/* Validando destroy */
 	if (handler == gtk_main_quit) {
 		_uigtk.destroy = 1;
@@ -200,6 +190,15 @@ void uigtk_main(void) {
 	gtk_main();
 	/* Apagando builder após o looping */
 	_uigtk.builder = NULL;
+}
+
+/*...........................................................................*/
+
+GtkBuilder *uigtk_builder() {
+
+	_uigtk_check_uigtk(0, "builder");
+	/* Definindo valor */
+	return _uigtk.builder;
 }
 
 /*...........................................................................*/

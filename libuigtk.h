@@ -46,11 +46,6 @@ Willian Donadelli <wdonadelli@gmail.com>
 	#include <gtk/gtk.h>
 	
 /*-----------------------------------------------------------------------------
-	UIGTK_BUILDER retorna o GTK Builder
------------------------------------------------------------------------------*/
-	#define UIGTK_BUILDER
-
-/*-----------------------------------------------------------------------------
 	uigtk_init() inicia a inteface GTK a partir de um arquivo.ui (builde xml)
 	Argumentos:
 		file - é o nome do arquivo com a interface xml (.ui)
@@ -81,6 +76,15 @@ Willian Donadelli <wdonadelli@gmail.com>
 		Força o encerramento da aplicação se algum erro for encontrado
 -----------------------------------------------------------------------------*/
 	void uigtk_main(void);
+
+/*-----------------------------------------------------------------------------
+	uigtk_builder() retorna o ponteiro do builder para o argumento
+	Argumentos:
+		builder - variável a receber o ponteiro do builder
+	Saída:
+		Força o encerramento da aplicação se algum erro for encontrado
+-----------------------------------------------------------------------------*/
+	GtkBuilder *uigtk_builder();
 
 /*-----------------------------------------------------------------------------
 	uigtk_object() obtém o objeto da interface a partir de seu id
