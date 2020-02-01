@@ -73,7 +73,7 @@ void uigtk_init(char *file);
 #### Parameters
 
 |Name|Description|
-|--:|---|
+|--:|:--|
 |file|Interface file path|
 
 #### Returns
@@ -95,7 +95,7 @@ To connect the signals to your handlers, you must use the `uigtk_hadler()` funct
 #### Parameters
 
 |Name|Description|
-|--:|---|
+|--:|:--|
 |handler|Name of the handler function|
 
 #### Returns
