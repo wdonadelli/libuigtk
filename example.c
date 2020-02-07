@@ -16,11 +16,10 @@ static void bye(GtkWidget *widget, gpointer data) {
 
 
 int main(int argc, char *argv[]) {
-
 	
 	uigtk_init("example.ui");
+		uigtk_init("example.ui");
 
-	
 	//g_print("%s", G_OBJECT_TYPE_NAME(uigtk_object("btn1")));
 
 	//Padrão
@@ -28,9 +27,9 @@ int main(int argc, char *argv[]) {
 	//uigtk_callback("hello", hello);
 	//uigtk_callback("bye", bye);
 
-	//uigtk_handler(gtk_main_quit);
-	//uigtk_handler(hello);
-	//uigtk_handler(bye);
+	uigtk_handler(gtk_main_quit);
+	uigtk_handler(hello);
+	uigtk_handler(bye);
 
 	//Alternativo
 	//uigtk_connect("window", "destroy", gtk_main_quit);
@@ -38,4 +37,8 @@ int main(int argc, char *argv[]) {
 	//uigtk_connect("btn2", "pressed", bye);
 
 	uigtk_main();
+	
+	
+	
+	
 }

@@ -52,7 +52,7 @@ Willian Donadelli <wdonadelli@gmail.com>
 	Saída:
 		Força o encerramento da aplicação se algum erro for encontrado
 -----------------------------------------------------------------------------*/
-	void uigtk_init(char *file);
+	void uigtk_init (char *file);
 
 /*-----------------------------------------------------------------------------
 	uigtk_callback() conecta os sinais definidos diretamente na interface
@@ -63,7 +63,7 @@ Willian Donadelli <wdonadelli@gmail.com>
 		Força o encerramento da aplicação se algum erro for encontrado
 	Sugere o uso da macro uigtk_handler()
 -----------------------------------------------------------------------------*/
-	void uigtk_callback(char *name, void (*handler)());
+	void uigtk_callback (char *name, void (*handler)());
 
 /*-----------------------------------------------------------------------------
 	uigtk_handler() macro para uigtk_callback() (name desnecessário)
@@ -75,7 +75,7 @@ Willian Donadelli <wdonadelli@gmail.com>
 	Saída:
 		Força o encerramento da aplicação se algum erro for encontrado
 -----------------------------------------------------------------------------*/
-	void uigtk_main(void);
+	void uigtk_main (void);
 
 /*-----------------------------------------------------------------------------
 	uigtk_builder() retorna o ponteiro do builder para o argumento
@@ -84,7 +84,7 @@ Willian Donadelli <wdonadelli@gmail.com>
 	Saída:
 		Força o encerramento da aplicação se algum erro for encontrado
 -----------------------------------------------------------------------------*/
-	GtkBuilder *uigtk_builder();
+	GtkBuilder *uigtk_builder ();
 
 /*-----------------------------------------------------------------------------
 	uigtk_object() obtém o objeto da interface a partir de seu id
@@ -94,19 +94,7 @@ Willian Donadelli <wdonadelli@gmail.com>
 	Argumentos:
 		id - identificador do objeto
 -----------------------------------------------------------------------------*/
-	GObject *uigtk_object(char *id);
-
-/*-----------------------------------------------------------------------------
-	uigtk_connect() adiciona disparadores a um objeto da interface
-	Retornos:
-		0 - se não for possível vincular o disparador
-		1 - se for possível vincular o disparador
-	Argumentos:
-		id      - identificador do objeto
-		event   - evento a ser disparado
-		handler - função a ser disparada quando o evento ocorrer
------------------------------------------------------------------------------*/
-	int uigtk_connect(char *id, char *event, void (*handler)());
+	GObject *uigtk_object (char *id);
 
 /*-----------------------------------------------------------------------------
 	uigtk_dialog() exibe uma caixa de mensagem
@@ -123,6 +111,6 @@ Willian Donadelli <wdonadelli@gmail.com>
 			4 - para caixa genérica (CANCELAR)
 		text - texto da mensagem
 -----------------------------------------------------------------------------*/
-	int uigtk_dialog(int type, char *text);
+	int uigtk_dialog (int type, char *text);
 
 #endif
