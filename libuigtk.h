@@ -61,13 +61,10 @@ Willian Donadelli <wdonadelli@gmail.com>
 		handler - função a ser disparada quando o evento ocorrer
 	Saída:
 		Força o encerramento da aplicação se algum erro for encontrado
-	Sugere o uso da macro uigtk_handler()
+	Sugere-se o uso da macro uigtk_handler()
 -----------------------------------------------------------------------------*/
 	void uigtk_callback (char *name, void (*handler)());
 
-/*-----------------------------------------------------------------------------
-	uigtk_handler() macro para uigtk_callback() (name desnecessário)
------------------------------------------------------------------------------*/
 	#define uigtk_handler(handler) uigtk_callback(#handler, handler)
 
 /*-----------------------------------------------------------------------------
@@ -83,8 +80,12 @@ Willian Donadelli <wdonadelli@gmail.com>
 		builder - variável a receber o ponteiro do builder
 	Saída:
 		Força o encerramento da aplicação se algum erro for encontrado
+	Sugere-se o uso da macro uigtk_set_builder() se for associar a uma variável
+		var é o nome da variável sem necessidade de definição de tipo
 -----------------------------------------------------------------------------*/
-	GtkBuilder *uigtk_builder ();
+	GtkBuilder *uigtk_builder (void);
+	
+	#define uigtk_set_builder(var) GtkBuilder *var = uigtk_builder ()
 
 /*-----------------------------------------------------------------------------
 	uigtk_object() obtém o objeto da interface a partir de seu id
@@ -93,8 +94,12 @@ Willian Donadelli <wdonadelli@gmail.com>
 		GObject - se o objeto for encontrado
 	Argumentos:
 		id - identificador do objeto
+	Sugere-se o uso da macro uigtk_set_object() se for associar a uma variável
+		var é o nome da variável sem necessidade de definição de tipo
 -----------------------------------------------------------------------------*/
 	GObject *uigtk_object (char *id);
+
+	#define uigtk_set_object(var, id) GObject *var = uigtk_object (id)
 
 /*-----------------------------------------------------------------------------
 	uigtk_dialog() exibe uma caixa de mensagem
@@ -111,6 +116,5 @@ Willian Donadelli <wdonadelli@gmail.com>
 			4 - para caixa genérica (CANCELAR)
 		text - texto da mensagem
 -----------------------------------------------------------------------------*/
-	int uigtk_dialog (int type, char *text);
-
+	int uigtk_dialog (int type, char *title, char *text);
 #endif

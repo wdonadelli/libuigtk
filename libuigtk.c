@@ -131,13 +131,9 @@ GObject *uigtk_object (char *id)
 	return gtk_builder_get_object(_uigtk_builder, id);
 }
 
-
-	//g_print("%s", G_OBJECT_TYPE_NAME(uigtk_object("btn1")));
-
-
 /*...........................................................................*/
 
-int uigtk_dialog (int type, char *text)
+int uigtk_dialog (int type, char *title, char *text)
 {
 	UIGTK_INIT_CHECK("dialog");
 
@@ -171,14 +167,18 @@ int uigtk_dialog (int type, char *text)
 	}
 
 	/* Definindo a caixa de mensagem */
-	dialog = gtk_message_dialog_new(
+	dialog = gtk_message_dialog_new	(
 		_uigtk_window,
 		GTK_DIALOG_MODAL,
 		style,
 		button,
-		"\n%s\n",
-		text
+		"\n%s",
+		(title != NULL ? title : text)
 	);
+
+	if (title != NULL) {
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), "\n%s", text);
+	}
 
 	/* Obtendo o resultado */
 	result = gtk_dialog_run(GTK_DIALOG(dialog));	
@@ -197,3 +197,5 @@ int uigtk_dialog (int type, char *text)
 	}
 	return 0;
 }
+
+//interessante: g_print("%s", G_OBJECT_TYPE_NAME(uigtk_get_object("btn1")));
