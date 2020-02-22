@@ -291,7 +291,7 @@ Returns an integer value depending on the answer:
 
 ### v1.0.0
 
-- Published on 2020-03-01
+- Published on 2020-02-22
 
 ## Author
 
