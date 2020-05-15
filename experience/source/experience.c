@@ -14,7 +14,7 @@ static void bye(GtkWidget *widget, gpointer data) {
 
 int main(int argc, char *argv[]) {
 
-	uigtk_init("example.ui");
+	uigtk_init("interface/experience.ui");
 
 	uigtk_handler(gtk_main_quit);
 	uigtk_handler(hello);
