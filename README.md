@@ -4,12 +4,12 @@ UIGTK is a C-language written library designed to simplify the creation of the g
 
 ## Handbook
 
-[https://wdonadelli.github.io/libuigtk/](https://wdonadelli.github.io/libuigtk/)
+- [https://wdonadelli.github.io/libuigtk/](https://wdonadelli.github.io/libuigtk/)
 
 ## Source Code
 
-- [libuigtk.h](https://wdonadelli.github.io/libcsrequest/libuigtk.h)
-- [libuigtk.c](https://wdonadelli.github.io/libcsrequest/libuigtk.c)
+- [libuigtk.h](https://wdonadelli.github.io/libuigtk/libuigtk.h)
+- [libuigtk.c](https://wdonadelli.github.io/libuigtk/libuigtk.c)
 
 ## Package
 
@@ -17,7 +17,7 @@ UIGTK is a C-language written library designed to simplify the creation of the g
 
 ## Compilation (GCC) 
 
-To compile the source code it is necessary to use the \`pkg-config --cflags gtk+-3.0\` and \`pkg-config --libs gtk+-3.0\` flags.
+To compile the source code it is necessary to use the _pkg-config --cflags gtk+-3.0_ and _pkg-config --libs gtk+-3.0_ flags.
 
 ```sh
 gcc `pkg-config --cflags gtk+-3.0` -c libuigtk.c  `pkg-config --libs gtk+-3.0`

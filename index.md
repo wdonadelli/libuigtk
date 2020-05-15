@@ -287,12 +287,35 @@ Returns an integer value depending on the answer:
 - 0 if the box has been closed; and
 - 1 if "yes" or "ok" is chosen.
 
-## Release Notes
+## Additional Notes
 
-### v1.0.0
+### Handbook
 
-- Published on 2020-02-22
+- [https://wdonadelli.github.io/libuigtk/](https://wdonadelli.github.io/libuigtk/)
 
-## Author
+### Source Code
+
+- [libuigtk.h](https://wdonadelli.github.io/libuigtk/libuigtk.h)
+- [libuigtk.c](https://wdonadelli.github.io/libuigtk/libuigtk.c)
+
+### Package
+
+- *libgtk-3-dev* package or equivalent.
+
+### Compilation (GCC) 
+
+To compile the source code it is necessary to use the _pkg-config --cflags gtk+-3.0_ and _pkg-config --libs gtk+-3.0_ flags.
+
+```sh
+gcc `pkg-config --cflags gtk+-3.0` -c libuigtk.c  `pkg-config --libs gtk+-3.0`
+```
+
+### Versions
+
+#### v1.0.0 (2020-02-22)
+
+- Initial release.
+
+### Authors
 
 - Willian Donadelli (<wdonadelli@gmail.com>)
