@@ -63,7 +63,7 @@ The construction is divided into three phases:
 To initialize the interface, the `uigtk_unit()` function must be used, whose characteristics are described below:
 
 ```c
-void uigtk_init(char *file);
+int uigtk_init(char *file);
 ```
 
 #### Parameters
@@ -74,13 +74,7 @@ void uigtk_init(char *file);
 
 #### Returns
 
-Forces the application to exit if any identifiable error is found. Possible errors are:
-
-- multiple function calls
-- Failed to initialize GTK;
-- Failed to initialize GTK Builder;
-- Failed to load the interface file; and
-- Failed to set the top level window.
+`0` if a known error has occurred and `1` for successful calls.
 
 ### Connecting signals
 
@@ -94,26 +88,35 @@ To connect the signals to your handlers, you must use the `uigtk_hadler()` funct
 
 |Name|Description|
 |:--|:--|
-|handler|Name of the handler function|
+|handler|Handler function|
 
 #### Returns
 
-Forces the application to exit if any identifiable error is found. Possible errors are:
+`0` if a known error has occurred and `1` for successful calls.
 
-- Call the function before calling the uigtk_init function.
+#### Alternative procedure
+
+If you need to assign a function name that does not match the `handler` attribute, the `uigtk_callback ()` function can be used with the following prototype:
+
+```c
+int uigtk_callback (char *name, void (*handler)())
+```
+
+|Name|Description|
+|:--|:--|
+|name|Handler attribute value|
+|handler|Handler function|
 
 ### Start the main loop
 
 To start the main loop, use the `uigtk_main()` function, whose characteristics are described below:
 
 ```c
-void uigtk_main()
+int uigtk_main()
 ```
 #### Returns
 
-Forces the application to exit if any identifiable error is found. Possible errors are:
-
-- Call the function before calling the uigtk_init function;
+`0` if a known error has occurred and `1` for successful calls.
 
 At the end of the looping, a new call to the uigtk_init function will be required.
 
@@ -189,11 +192,7 @@ void main(int argc, char *argv[]) {
 
 Don't forget to define the actions of the manipulators.
 
-## Compilation
-
-The library was tested using the following version of gcc:
-
-> gcc (Ubuntu 7.4.0-1ubuntu1~18.04.1) 7.4.0
+## GCC Compilation
 
 To compile and run the application, the following commands were executed:
 
@@ -218,7 +217,7 @@ GtkBuilder *uigtk_builder (void)
 
 #### Returns
 
-Returns the pointer to GTK Builder. If you want to link the value to a variable, alternatively, you can use the macro below:
+Returns the pointer to GTK Builder or NULL if any known errors occur. If you want to link the value to a variable, alternatively, you can use the macro below:
 
 ```c
 #define uigtk_set_builder(var)
@@ -243,7 +242,7 @@ GObject *uigtk_object (char *id)
 
 #### Returns
 
-Returns the pointer to object. If you want to link the value to a variable, alternatively, you can use the macro below:
+Returns the pointer to object or NULL if any known errors occur. If you want to link the value to a variable, alternatively, you can use the macro below:
 
 ```c
 #define uigtk_set_object(var, id)
@@ -311,6 +310,11 @@ gcc `pkg-config --cflags gtk+-3.0` -c libuigtk.c  `pkg-config --libs gtk+-3.0`
 ```
 
 ### Versions
+
+#### v1.1.0 (2020-05-18)
+
+- Improved function returns; and
+- Improved terminal messages.
 
 #### v1.0.0 (2020-02-22)
 

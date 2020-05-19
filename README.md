@@ -25,9 +25,10 @@ gcc `pkg-config --cflags gtk+-3.0` -c libuigtk.c  `pkg-config --libs gtk+-3.0`
 
 ## Versions
 
-### v1.0.0 (2020-02-22)
+### v1.1.0 (2020-05-18)
 
-- Initial release.
+- Improved function returns; and
+- Improved terminal messages.
 
 ## Authors
 

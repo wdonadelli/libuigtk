@@ -13,12 +13,14 @@ static void bye(GtkWidget *widget, gpointer data) {
 }
 
 int main(int argc, char *argv[]) {
+	//printf("dialog:   %d\n", uigtk_dialog(3, "My Title", "My message."));
+	//printf("init:     %d\n", uigtk_init("interface/experience.ui"));
+	printf("init:     %d\n", uigtk_init("interface/experience.ui"));
+	printf("callback: %d\n", uigtk_handler(gtk_main_quit));
+	printf("callback: %d\n", uigtk_handler(hello));
+	printf("callback: %d\n", uigtk_handler(bye));
+	printf("main: %d\n", uigtk_main());
+	//printf("dialog:   %d\n", uigtk_dialog(3, "My Title", "My message."));
 
-	uigtk_init("interface/experience.ui");
 
-	uigtk_handler(gtk_main_quit);
-	uigtk_handler(hello);
-	uigtk_handler(bye);
-
-	uigtk_main();
 }

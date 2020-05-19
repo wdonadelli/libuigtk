@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
-Library UI GTK (v1.0.0) <wdonadelli@gmail.com>
+Library UI GTK (v1.1.0) <wdonadelli@gmail.com>
 
 This is a C-language written library designed to facilitate the creation of
 the graphical environment with the GTK tool using the kit's GtkBuilder function.
@@ -51,9 +51,10 @@ SOFTWARE.
 	Argumentos:
 		file - é o nome do arquivo com a interface xml (.ui)
 	Saída:
-		Força o encerramento da aplicação se algum erro for encontrado
+		0 para erro conhecido
+		1 para sucesso
 -----------------------------------------------------------------------------*/
-	void uigtk_init (char *file);
+	int uigtk_init (char *file);
 
 /*-----------------------------------------------------------------------------
 	uigtk_callback() conecta os sinais definidos diretamente na interface
@@ -61,26 +62,27 @@ SOFTWARE.
 		name    - nome da função a ser disparada quando o evento ocorrer
 		handler - função a ser disparada quando o evento ocorrer
 	Saída:
-		Força o encerramento da aplicação se algum erro for encontrado
+		0 para erro conhecido
+		1 para sucesso
 	Sugere-se o uso da macro uigtk_handler()
 -----------------------------------------------------------------------------*/
-	void uigtk_callback (char *name, void (*handler)());
+	int uigtk_callback (char *name, void (*handler)());
 
 	#define uigtk_handler(handler) uigtk_callback(#handler, handler)
 
 /*-----------------------------------------------------------------------------
 	uigtk_main() inicia o looping principal do GTK (última ação)
 	Saída:
-		Força o encerramento da aplicação se algum erro for encontrado
+		0 para erro conhecido
+		1 para sucesso
 -----------------------------------------------------------------------------*/
-	void uigtk_main (void);
+	int uigtk_main (void);
 
 /*-----------------------------------------------------------------------------
-	uigtk_builder() retorna o ponteiro do builder para o argumento
-	Argumentos:
-		builder - variável a receber o ponteiro do builder
+	uigtk_builder() retorna o ponteiro do builder
 	Saída:
-		Força o encerramento da aplicação se algum erro for encontrado
+		NULL       - se algum erro conhecido for localizado
+		GtkBuilder - se tiver sido inicializada adequadamente
 	Sugere-se o uso da macro uigtk_set_builder() se for associar a uma variável
 		var é o nome da variável sem necessidade de definição de tipo
 -----------------------------------------------------------------------------*/
@@ -91,7 +93,7 @@ SOFTWARE.
 /*-----------------------------------------------------------------------------
 	uigtk_object() obtém o objeto da interface a partir de seu id
 	Retornos:
-		NULL    - se o objeto não for encontrado
+		NULL    - se algum erro conhecido ocorrer ou objeto não encontrado
 		GObject - se o objeto for encontrado
 	Argumentos:
 		id - identificador do objeto
@@ -109,13 +111,14 @@ SOFTWARE.
 		 0 - se a caixa foi fechada
 		 1 - se "sim" ou "ok" forem clicados
 	Argumentos:
-		type - 
-			0 - para caixa de informação (OK)
-			1 - para caixa de alerta (OK)
-			2 - para caixa de erro (OK)
-			3 - para caixa de questão (SIM/NÃO)
-			4 - para caixa genérica (CANCELAR)
-		text - texto da mensagem
+		type  - 
+			0  - para caixa de informação (OK)
+			1  - para caixa de alerta (OK)
+			2  - para caixa de erro (OK)
+			3  - para caixa de questão (SIM/NÃO)
+			4  - para caixa genérica (CANCELAR)
+		title - título da caixa
+		text  - texto da mensagem
 -----------------------------------------------------------------------------*/
 	int uigtk_dialog (int type, char *title, char *text);
 #endif

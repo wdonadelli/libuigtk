@@ -1,121 +1,214 @@
-/*___BIBLIOTECAS_____________________________________________________________*/
-
 #include "libuigtk.h"
 
-/*___MACROS__________________________________________________________________*/
+/*___MACROS___________________________________________________________________*/
 
-/* Mensagens */
-#define UIGTK_MSG_NO_INIT "UIGTK not initialized, call uigtk_init ()."
-#define UIGTK_MSG_INIT "UIGTK already initialized."
-#define UIGTK_MSG_NO_WINDOW "Top level window (GtkWindow) not found."
-#define UIGTK_MSG_NO_QUIT "gtk_main_quit handler not found."
+/* mensagens */
 
-/* Tipos de mensagens */
-#define UIGTK_MSG "\n\033[1;%dm%s[%d] \033[1;36mlibuigtk.uigtk_%s ()\033[0m:\n\t\"%s\"\n\n"
+#define UIGTK_MSG_INIT       "UIGTK already initialized."
+#define UIGTK_MSG_NO_BUILDER "Error getting GtkBuilder."
+#define UIGTK_MSG_NO_WINDOW  "Top level window (GtkWindow) not found."
+#define UIGTK_MSG_NO_INIT    "UIGTK not initialized."
+#define UIGTK_MSG_NO_QUIT    "gtk_main_quit handler not found."
+#define UIGTK_MSG_ERR_QUIT   "Error when setting gtk_main_quit automatically."
+#define UIGTK_MSG_NO_FILE    "Interface file not found."
 
-#define UIGTK_INFO(msg, name) g_print(UIGTK_MSG, 34, "INFO", __LINE__, name, msg)
-#define UIGTK_WARN(msg, name) g_print(UIGTK_MSG, 33, "WARN", __LINE__, name, msg)
-#define UIGTK_ERROR(msg, name) g_printerr(UIGTK_MSG, 31, "ERROR", __LINE__, name, msg);
+/* protótipos */
+#define UIGTK_INIT       "uigtk_init (char *file)"
+#define UIGTK_CALLBACK   "void uigtk_callback (char *name, void (*handler)())"
+#define UIGTK_HANDLER    "uigtk_handler (handler)"
+#define UIGTK_MAIN       "uigtk_main (void)"
+#define UIGTK_BUILDER    "uigtk_builder (void)"
+#define UIGTK_OBJECT     "uigtk_object (char *id)"
+#define UIGTK_SET_OBJECT "uigtk_set_object (var, id)"
+#define UIGTK_DIALOG     "uigtk_dialog (int type, char *title, char *text)"
 
-#define UIGTK_INIT_CHECK(name) if (!_uigtk_init) {UIGTK_ERROR(UIGTK_MSG_NO_INIT, name); exit(1);}
+/* mensagem de saída padrão */
+#define UIGTK_MSG "\n\
+\033[0;1;7;%dm %s \
+\033[0m \
+\033[0;1;3;96mlibuigtk\
+\033[0m > %s\
+\033[0;2;3m\n\t%s\
+\033[0m\n\n"
 
-/*___VARIÁVEIS_GLOBAIS_______________________________________________________*/
+/* mensagens de erro */
+#define UIGTK_INFO(msg) \
+	g_print(UIGTK_MSG, 34, "INFO", _uigtk_prototype, msg)
 
-/*-- _uigtk guarda o status e os ponteiros --*/
-int _uigtk_init = 0;
-int _uigtk_quit = 0;
-GtkBuilder *_uigtk_builder = NULL;
-GtkWindow *_uigtk_window = NULL;
+#define UIGTK_WARN(msg) \
+	g_print(UIGTK_MSG, 33, "WARN", _uigtk_prototype, msg)
 
-/*___FUNÇÕES_INTERNAS________________________________________________________*/
+#define UIGTK_ERROR(msg) \
+	g_printerr(UIGTK_MSG, 31, "ERROR", _uigtk_prototype, msg)
 
-static void _uigtk_top_level (void)
-/*-- Localiza window top level: retorna 1 ou 0 (sucesso ou erro) --*/
+/*___VARIÁVEIS_INTERNAS_______________________________________________________*/
+
+static int _uigtk_init = 0;               /* registra a inicialização do uigtk */
+static int _uigtk_quit = 0;               /* registra existência de gtk_main_quit */
+static int _uigtk_win  = 0;               /* registra existência de toplevel */
+static char *_uigtk_prototype     = NULL; /* registra o protótipo da função */
+static GtkBuilder *_uigtk_builder = NULL; /* guarda o construtor */
+static GtkWindow *_uigtk_window   = NULL; /* guarda a janela principal */
+
+/*___FUNÇÕES_INTERNAS_________________________________________________________*/
+
+static int _uigtk_top_level (void)
+/* Localiza window top level: retorna 1 ou 0 (sucesso ou erro) */
 {
-	/* Obter objetos https://developer.gnome.org/gtk3/stable/GtkBuilder.html#gtk-builder-get-objects */
+	/* definindo valor inicial */
+	_uigtk_win = 0;
+
+	/* obter objetos */
+	/* https://developer.gnome.org/gtk3/stable/GtkBuilder.html#gtk-builder-get-objects */
 	GSList *objects = gtk_builder_get_objects(_uigtk_builder);
 
-	/* Obter janela https://developer.gnome.org/gtk3/stable/GtkWidget.html#gtk-widget-get-toplevel */
+	/* obter janela */
+	/* https://developer.gnome.org/gtk3/stable/GtkWidget.html#gtk-widget-get-toplevel */
 	GtkWidget *window  = gtk_widget_get_toplevel((GtkWidget*) objects->data);
 
-	/* Limpando memória https://developer.gnome.org/glib/stable/glib-Singly-Linked-Lists.html#g-slist-free */
+	/* limpar memória */
+	/* https://developer.gnome.org/glib/stable/glib-Singly-Linked-Lists.html#g-slist-free */
 	g_slist_free(objects);
 
-	/* Checando sucesso https://developer.gnome.org/gtk3/stable/GtkWidget.html#gtk-widget-is-toplevel */
-	if (!gtk_widget_is_toplevel(window)) {
-		UIGTK_ERROR(UIGTK_MSG_NO_WINDOW, "init");
-		exit(1);
+	/* checar sucesso na obtenção da janela */
+	/* https://developer.gnome.org/gtk3/stable/GtkWidget.html#gtk-widget-is-toplevel */
+	if (gtk_widget_is_toplevel(window)) {
+		_uigtk_window = GTK_WINDOW(window);
+		_uigtk_win = 1;
 	}
-	_uigtk_window = GTK_WINDOW(window);
+	
+	return _uigtk_win;
 }
 
 
 /*___FUNÇÕES_DO_CABEÇALHO____________________________________________________*/
 
-void uigtk_init (char *file)
+int uigtk_init (char *file)
 {
-	/* Verificando existência de inicialização */
-	if (_uigtk_init == 1) {
-		UIGTK_ERROR(UIGTK_MSG_INIT, "init");
-		exit(1);
+	/* definindo protótipo */
+	_uigtk_prototype = UIGTK_INIT;
+	
+	/* Verificando se a inicialização já ocorreu */
+	if (_uigtk_init) {
+		UIGTK_WARN(UIGTK_MSG_INIT);
+		return 0;
 	}
 
-	/* Carregando GTK https://developer.gnome.org/gtk3/stable/gtk3-General.html#gtk-init */
+	/* Carregando GTK */
+	/* https://developer.gnome.org/gtk3/stable/gtk3-General.html#gtk-init */
 	gtk_init(0, NULL);
 
-	/* Carregando GTK Builder https://developer.gnome.org/gtk3/stable/GtkBuilder.html#gtk-builder-new-from-file */
+	/* testando a existência do arquivo */
+	if (file == NULL || !g_file_test (file, G_FILE_TEST_EXISTS)) {
+		UIGTK_ERROR(UIGTK_MSG_NO_FILE);
+		return 0;
+	}
+
+	/* Carregando GTK Builder */
+	/* https://developer.gnome.org/gtk3/stable/GtkBuilder.html#gtk-builder-new-from-file */
 	_uigtk_builder = gtk_builder_new_from_file(file);
 
+	/* exagero de cautela: no caso de erro acima, deveria abortar o programa */	
+	if (_uigtk_builder == NULL) {
+		UIGTK_ERROR(UIGTK_MSG_NO_BUILDER);
+		return 0;
+	}
+
 	/* Obtendo a window top level */
-	_uigtk_top_level();
+	if (!_uigtk_top_level()) {
+		UIGTK_INFO(UIGTK_MSG_NO_WINDOW);
+	}
 	
 	/* Defindo sucesso na inicialização */
 	_uigtk_init = 1;
+
+	return _uigtk_init;
 }
 
 /*...........................................................................*/
 
-void uigtk_callback (char *name, void (*handler)())
+int uigtk_callback (char *name, void (*handler)())
 {
-	UIGTK_INIT_CHECK("handler");
+	/* definindo protótipo */
+	_uigtk_prototype = UIGTK_CALLBACK;
 
-	/* Definindo handlers https://developer.gnome.org/gtk3/stable/GtkBuilder.html#gtk-builder-add-callback-symbol  */
-	gtk_builder_add_callback_symbol(_uigtk_builder, name, G_CALLBACK(handler));
-
-	/* Validando gtk_main_quit https://developer.gnome.org/gtk3/stable/gtk3-General.html#gtk-main-quit */
-	if (handler == gtk_main_quit) _uigtk_quit = 1;
-}
-
-/*...........................................................................*/
-
-void uigtk_main (void)
-{
-	UIGTK_INIT_CHECK("main");
-
-	/* Adicionar gtk_main_quit se indefinido https://developer.gnome.org/gobject/stable/gobject-Signals.html#g-signal-connect */
-	if (!_uigtk_quit && _uigtk_window != NULL) {
-		UIGTK_WARN(UIGTK_MSG_NO_QUIT, "main");
-		g_signal_connect(G_OBJECT(_uigtk_window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
+	/* Verificando se a inicialização já ocorreu */
+	if (!_uigtk_init) {
+		UIGTK_ERROR(UIGTK_MSG_NO_INIT);
+		return 0;
 	}
 
-	/* Conectando sinais https://developer.gnome.org/gtk3/stable/GtkBuilder.html#gtk-builder-connect-signals */
+	/* Definindo handlers */
+	/* https://developer.gnome.org/gtk3/stable/GtkBuilder.html#gtk-builder-add-callback-symbol */
+	gtk_builder_add_callback_symbol(_uigtk_builder, name, G_CALLBACK(handler));
+
+	/* Validando gtk_main_quit */
+	/* https://developer.gnome.org/gtk3/stable/gtk3-General.html#gtk-main-quit */
+	if (handler == gtk_main_quit) {
+		_uigtk_quit = 1;
+	}
+	
+	return 1;
+}
+
+/*...........................................................................*/
+
+int uigtk_main (void)
+{
+	/* variáveis iniciais */
+	int gsignal;
+
+	/* definindo protótipo */
+	_uigtk_prototype = UIGTK_MAIN;
+
+	/* Verificando se a inicialização já ocorreu */
+	if (!_uigtk_init) {
+		UIGTK_ERROR(UIGTK_MSG_NO_INIT);
+		return 0;
+	}
+
+	/* Adicionar gtk_main_quit se não definido */
+	/* https://developer.gnome.org/gobject/stable/gobject-Signals.html#g-signal-connect */
+	if (!_uigtk_quit && _uigtk_window) {
+		UIGTK_INFO(UIGTK_MSG_NO_QUIT);
+		gsignal = g_signal_connect(
+			G_OBJECT(_uigtk_window), "destroy", G_CALLBACK(gtk_main_quit), NULL
+		);
+		if (gsignal <= 0) {
+			UIGTK_INFO(UIGTK_MSG_ERR_QUIT);
+		}
+	}
+
+	/* Conectando sinais */
+	/* https://developer.gnome.org/gtk3/stable/GtkBuilder.html#gtk-builder-connect-signals */
 	gtk_builder_connect_signals(_uigtk_builder, NULL);
 
-	/* GTK main loop https://developer.gnome.org/gtk3/stable/gtk3-General.html#gtk-main */
+	/* GTK main loop */
+	/* https://developer.gnome.org/gtk3/stable/gtk3-General.html#gtk-main */
 	gtk_main();
 
 	/* Resetando status */
-	_uigtk_init = 0;
-	_uigtk_quit = 0;
+	_uigtk_init    = 0;
+	_uigtk_win     = 0;
+	_uigtk_quit    = 0;
 	_uigtk_builder = NULL;
-	_uigtk_window = NULL;
+	_uigtk_window  = NULL;
+
+	return 1;
 }
 
 /*...........................................................................*/
 
 GtkBuilder *uigtk_builder (void)
 {
-	UIGTK_INIT_CHECK("builder");
+	/* definindo protótipo */
+	_uigtk_prototype = UIGTK_BUILDER;
+
+	/* Verificando se a inicialização já ocorreu */
+	if (!_uigtk_init) {
+		UIGTK_ERROR(UIGTK_MSG_NO_INIT);
+		return NULL;
+	}
 
 	/* retornando valor */
 	return _uigtk_builder;
@@ -125,9 +218,17 @@ GtkBuilder *uigtk_builder (void)
 
 GObject *uigtk_object (char *id)
 {
-	UIGTK_INIT_CHECK("object");
+	/* definindo protótipo */
+	_uigtk_prototype = UIGTK_OBJECT;
+
+	/* Verificando se a inicialização já ocorreu */
+	if (!_uigtk_init) {
+		UIGTK_ERROR(UIGTK_MSG_NO_INIT);
+		return NULL;
+	};
 
 	/* Retornando objeto */
+	/* https://developer.gnome.org/gtk3/stable/GtkBuilder.html#gtk-builder-get-object */
 	return gtk_builder_get_object(_uigtk_builder, id);
 }
 
@@ -135,7 +236,19 @@ GObject *uigtk_object (char *id)
 
 int uigtk_dialog (int type, char *title, char *text)
 {
-	UIGTK_INIT_CHECK("dialog");
+		/* definindo protótipo */
+	_uigtk_prototype = UIGTK_DIALOG;
+
+	/* Verificando se a inicialização já ocorreu */
+	if (!_uigtk_init) {
+		UIGTK_INFO(UIGTK_MSG_NO_INIT);
+		gtk_init(0, NULL);
+	};
+
+	/* Verificando se há window toplevel */
+	if (!_uigtk_win) {
+		UIGTK_INFO(UIGTK_MSG_NO_WINDOW);
+	};
 
 	/* Definir variáveis */
 	GtkButtonsType button;
@@ -177,7 +290,9 @@ int uigtk_dialog (int type, char *title, char *text)
 	);
 
 	if (title != NULL) {
-		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), "\n%s", text);
+		gtk_message_dialog_format_secondary_text(
+			GTK_MESSAGE_DIALOG(dialog), "\n%s", text
+		);
 	}
 
 	/* Obtendo o resultado */
