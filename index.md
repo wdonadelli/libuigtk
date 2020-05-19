@@ -60,7 +60,7 @@ The construction is divided into three phases:
 
 ### Interface initialization
 
-To initialize the interface, the `uigtk_unit()` function must be used, whose characteristics are described below:
+To initialize the interface, the `uigtk_init()` function must be used, whose characteristics are described below:
 
 ```c
 int uigtk_init(char *file);
