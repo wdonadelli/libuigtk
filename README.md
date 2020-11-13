@@ -4,7 +4,7 @@ UIGTK is a C-language written library designed to simplify the creation of the g
 
 ## Handbook
 
-- [https://wdonadelli.github.io/libuigtk/](https://github.com/wdonadelli/libuigtk/wiki)
+- [https://github.com/wdonadelli/libuigtk/wiki](https://github.com/wdonadelli/libuigtk/wiki)
 
 ## Source Code
 
